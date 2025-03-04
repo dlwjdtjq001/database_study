@@ -1,0 +1,83 @@
+
+-- 트리거
+use ssgdb;
+create table if not exists testTBL (id int, txt varchar(20));
+insert into testTBL(id,txt) values (1, '레드벨벳'), (2, '잇지'), (3, '블랙핑크');
+select * from testTBL;
+
+delimiter //
+create trigger testTrg
+    after delete
+    on testTBL
+    for each row
+    begin
+        set @msg = '가수 스룹이 삭제됨';
+    end //
+delimiter ;
+
+set @msg = '';
+insert into testTBL values (4,'마마무');
+select @msg;
+update testTBL set txt = '블핑' where id = 3;
+select @msg;
+delete from testTBL where id = 4;
+select @msg;
+
+create table backup_userTBL(
+    userId char(8) not null primary key,
+    name varchar(10) not null,
+    birthYear int not null,
+    addr char(2) not null,
+    mobile1 char(3),
+    mobile2 char(8),
+    height smallint,
+    mDate date,
+    modType char(2),
+    modDate date,
+    modUser varchar(256)
+);
+
+drop trigger if exists backupUserTBL_UpdateTrg;
+
+delimiter //
+create trigger backupUserTBL_UpdateTrg
+    after  update
+    on usertbl
+    for each row
+begin
+    insert into backup_userTBL values (old.userID, OLD.name, old.birthYear, old.addr, old.mobile1, old.mobile2, old.height,
+                                       old.mDate, '수정' , CURDATE(), current_user());
+end //
+delimiter ;
+
+delimiter //
+create trigger backupUserTBL_deleteTrg
+    after  delete
+    on usertbl
+    for each row
+begin
+    insert into backup_userTBL values (old.userID, OLD.name, old.birthYear, old.addr, old.mobile1, old.mobile2, old.height,
+                                       old.mDate,'삭제' ,CURDATE(), current_user());
+end //
+delimiter ;
+
+update usertbl set addr = '몽고' where userID = 'jkw';
+select * from backup_userTBL;
+delete from usertbl where height >= 177;
+
+truncate table usertbl;
+
+drop trigger if exists userTBL_InsertTrg;
+delimiter //
+create trigger UserTBL_InsertTrg
+    after insert
+    on usertbl
+    for each row
+begin
+    signal sqlstate '45000'
+    set message_text = '데이터의 입력을 시도했습니다. 귀하의 정보가 서버에 기록외었습니다.';
+end //
+delimiter ;
+
+insert into usertbl values  ('ABC', '에비씨',1977, '서울', '011', '11111111', 181, '2019-12-25');
+
