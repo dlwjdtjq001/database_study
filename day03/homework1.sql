@@ -1,6 +1,6 @@
 -- 1-1
 use ssgdb;
--- select * from customer;
+select * from orders;
 select bookname
 from Book
 where bookid = 1;

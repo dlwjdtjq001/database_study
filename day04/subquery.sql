@@ -20,3 +20,11 @@ from customer
 where custid in (select custid from orders where bookid in (select bookid from book where publisher = '대한미디어') );
 
 -- 부속질의 간에는 상하관계가 있다. 먼저 하위 부속질의를 실행하고 그 결과를 이용하여 상위 부속질의를 실행한다.
+
+-- 상관 부속질의 (correlated subquery) 상위 부속질의와 하위 부속질의가 독립적이지 않고 서로 관련을 맺고 있다.
+
+-- 3-31 출판사별로 춢판사의 평균 도서 가격보다 비싼 도서를 구하시오
+select avg(price)
+from book;
+where 
+

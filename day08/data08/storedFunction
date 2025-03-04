@@ -1,0 +1,22 @@
+-- 스토어드 함수 : 파라미터에 in out 등을 사용할 수 없다.
+모두 입력 파라미터로 사용
+returns 문으로 반환할 값의 데이터 형식 지정
+
+어떤 계산 후에 하나의 반환하는데 주로 사용된다.
+
+set global log_bin_trust_function_creators = 1;
+
+
+use ssgdb;
+drop function if exists userFunc;
+delimiter $$
+create function userFunc(value1 int, value2 int)
+returns int
+begin
+    set value1 = value1 + value2;
+    return value1;
+end $$
+    delimiter ;
+
+select userFunc(1,2);
+
